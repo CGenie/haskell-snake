@@ -18,9 +18,10 @@ infixl 6 |+|
 data Direction = North | South | East | West
      deriving (Show, Eq, Ord)
 
--- board size
+-- | board size
 numRectsX :: Int
 numRectsX     = 11
+-- | board size
 numRectsY :: Int
 numRectsY     = 11
 
