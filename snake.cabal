@@ -45,6 +45,7 @@ cabal-version:       >=1.8
 source-repository head
     type:            git
     location:        https://github.com/CGenie/haskell-snake.git
+    tag:             0.1.0.0
 
 
 executable snake
