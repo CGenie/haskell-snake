@@ -37,13 +37,14 @@ getGameScreen :: MonadReader AppConfig m => m Surface
 getGameScreen = liftM gameScreen ask
 
 handleInput :: (MonadIO m, MonadState GameState m) => Event -> m ()
-handleInput (KeyDown (Keysym key _ _))
-                    | key == SDLK_a     = liftIO $ setCaption "asdf" []
-                    | key == SDLK_q     = liftIO $ pushEvent Quit
-                    | key == SDLK_DOWN  = changeDirection South
-                    | key == SDLK_UP    = changeDirection North
-                    | key == SDLK_LEFT  = changeDirection West
-                    | key == SDLK_RIGHT = changeDirection East
+handleInput (KeyDown (Keysym key _ _)) =
+                    case key of
+                        SDLK_a     -> liftIO $ setCaption "asdf" []
+                        SDLK_q     -> liftIO $ pushEvent Quit
+                        SDLK_DOWN  -> changeDirection South
+                        SDLK_UP    -> changeDirection North
+                        SDLK_LEFT  -> changeDirection West
+                        SDLK_RIGHT -> changeDirection East
                 where
                     changeDirection direction = do
                         gameState <- get
@@ -73,21 +74,12 @@ initEnv :: IO (AppConfig, GameState)
 initEnv = do
     screen <- setVideoMode screenWidth screenHeight screenBpp [SWSurface]
     gameScreen <- createRGBSurface [SWSurface] gameScreenWidth gameScreenHeight screenBpp 0 0 0 0
-    setCaption "Hello World" []
+    setCaption "Haskell Snake" []
 
     colorWhite <- (mapRGB . surfaceGetPixelFormat) screen 0xff 0xff 0xff
     colorBlack <- (mapRGB . surfaceGetPixelFormat) screen 0x0f 0x0f 0x0f
 
-    -- mapM_ is used to map a function over a list, this must return
-    --   an IO monad sequence instead of a list, like the usual map does
-    --   mapM_ is different from mapM in that it does not collect the results
-    --   of mapped computation (see also sequence and sequence_ in the
-    --   Control.Monad documentation)
-    --mapM_ (\rect -> fillRect gameScreen rect bgColor) rects
-    --paintRects gameScreen colorWhite
     paintBoard gameScreen
-
-    --paintBlack <- paintRects gameScreen rects colorBlack
 
     let msgDir = MessageDir False 
 
@@ -96,7 +88,7 @@ initEnv = do
 
     return (AppConfig screen gameScreen msgDir,
             initialGameState {applePosition = applePosition
-                             ,lastSnakeMove = tick }) -- timerState)
+                             ,lastSnakeMove = tick }) -- timerState
 
 
 runLoop :: AppConfig -> GameState -> IO ()
@@ -149,10 +141,11 @@ drawGame = do
     gameScreen  <- gameScreen `liftM` ask
     gameState   <- get
 
-    liftIO $ paintBoard gameScreen
-    liftIO $ paintApple gameScreen (applePosition gameState)
-    liftIO $ paintSnake gameScreen (snakeState gameState)
+    liftIO $ do
+        paintBoard gameScreen
+        paintApple gameScreen (applePosition gameState)
+        paintSnake gameScreen (snakeState gameState)
 
-    liftIO $ blitSurface gameScreen Nothing screen Nothing
+        blitSurface gameScreen Nothing screen Nothing
 
-    liftIO $ SDL.flip screen
+        SDL.flip screen

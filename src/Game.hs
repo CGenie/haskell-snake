@@ -51,6 +51,13 @@ rectFromPoint (Point x y) =
 
 rects = [rectFromPoint (Point x y) | x <- [1..numRectsX], y <- [1..numRectsY]]
 
+{-|
+  'mapM_' is used to map a function over a list, this must return
+   an IO monad sequence instead of a list, like the usual map does.
+   'mapM_' is different from 'mapM' in that it does not collect the results
+   of mapped computation (see also 'sequence' and 'sequence_' in the
+   "Control.Monad" documentation).
+-}
 paintRects gameScreen color = liftIO $ mapM_ (\rect -> fillRect gameScreen rect color) rects
 
 paintBoard :: Surface -> IO ()
