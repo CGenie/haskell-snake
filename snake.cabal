@@ -13,10 +13,10 @@ name:                snake
 version:             0.1.0.0
 
 -- A short (one-line) description of the package.
--- synopsis:            
+synopsis:            Snake game using the SDL library
 
 -- A longer description of the package.
--- description:         
+description:         Simple snake game that uses the SDL libary
 
 -- The license under which the package is released.
 license:             GPL-3
@@ -42,6 +42,12 @@ build-type:          Simple
 cabal-version:       >=1.8
 
 
+source-repository head
+    type:            git
+    location:        https://github.com/CGenie/haskell-snake.git
+    tag:             0.1.0.0
+
+
 executable snake
   -- .hs or .lhs file containing the Main module.
   hs-source-dirs:    src
@@ -51,10 +57,10 @@ executable snake
   other-modules:     Basic, Board, Game, Snake
   
   -- Other library packages from which modules are imported.
-  build-depends:       base ==4.6.*,
-                       SDL >= 0.6.4,
-                       mtl >= 2.1.2,
-                       containers >= 0.5.2,
+  build-depends:       base >=4.5.0.0,
+                       SDL >= 0.6.3,
+                       mtl >= 2.1.1,
+                       containers >= 0.4.2.1,
                        random -any
 
 Test-suite snake-test
