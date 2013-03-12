@@ -45,6 +45,7 @@ handleInput (KeyDown (Keysym key _ _)) =
                         SDLK_UP    -> changeDirection North
                         SDLK_LEFT  -> changeDirection West
                         SDLK_RIGHT -> changeDirection East
+                        _          -> return ()
                 where
                     changeDirection direction = do
                         gameState <- get
