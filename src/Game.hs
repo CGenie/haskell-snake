@@ -36,6 +36,10 @@ rectHeight    = gameScreenHeight `div` numRectsY
 
 data GameState = GameState {
      snakeState         :: SnakeState,
+     -- | Temporary state variable to store next move's snake direction
+     --   Without this when snake went North, and user quickly typed
+     --   West, then South, snake would bump into itself
+     nextSnakeDirection :: Direction,
      applePosition      :: Point,
      board              :: Board,
      level              :: Int,
@@ -43,6 +47,7 @@ data GameState = GameState {
 }
 
 initialGameState = GameState {snakeState = initialSnakeState
+                             ,nextSnakeDirection = direction initialSnakeState
                              ,applePosition = Point 0 0
                              ,board = initialBoard
                              ,level = 1

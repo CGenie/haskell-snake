@@ -44,16 +44,17 @@ handleInput (KeyDown (Keysym key _ _)) =
                     case key of
                         SDLK_a     -> liftIO $ setCaption "asdf" []
                         SDLK_q     -> liftIO $ pushEvent Quit
-                        SDLK_DOWN  -> changeDirection South
-                        SDLK_UP    -> changeDirection North
-                        SDLK_LEFT  -> changeDirection West
-                        SDLK_RIGHT -> changeDirection East
+                        SDLK_DOWN  -> changeNextSnakeDirection South
+                        SDLK_UP    -> changeNextSnakeDirection North
+                        SDLK_LEFT  -> changeNextSnakeDirection West
+                        SDLK_RIGHT -> changeNextSnakeDirection East
                         _          -> return ()
                 where
-                    changeDirection direction = do
+                    changeNextSnakeDirection dir = do
                         gameState <- get
                         snakeState <- snakeState `liftM` get
-                        put gameState {snakeState = changeSnakeDirection snakeState direction }
+                        --put gameState {snakeState = changeSnakeDirection snakeState direction }
+                        put gameState {nextSnakeDirection = tryChangeSnakeDirection dir (direction snakeState)}
 
 handleInput _ = return ()
 
@@ -94,7 +95,7 @@ initEnv = do
 
     return (AppConfig screen gameScreen msgDir,
             initialGameState {applePosition = applePosition
-                             ,lastSnakeMove = tick }) -- timerState
+                             ,lastSnakeMove = tick}) -- timerState
 
 
 runLoop :: AppConfig -> GameState -> IO ()
@@ -125,15 +126,18 @@ loop = do
 
         if (tickDifference > speedFromLevel (level gameState))
             then
-                if snakeEatsApple sp ap
-                    then do
-                        newApplePosition <- liftIO $ getRandomApple (position ss)
-                        -- increase snake's length
-                        put gameState {
-                            snakeState = increaseSnakeLength ss
-                           ,applePosition = newApplePosition}
-                        
-                    else put (moveSnakeGameState gameState tick)
+                do
+                    put (moveSnakeGameState gameState tick)
+
+                    if snakeEatsApple sp ap
+                        then do
+                            newApplePosition <- liftIO $ getRandomApple (position ss)
+                            -- increase snake's length
+                            put gameState {
+                                snakeState = increaseSnakeLength ss
+                               ,applePosition = newApplePosition}
+                            
+                        else return ()
             else return ()
 
         if (shouldIncreaseLevel ss)
@@ -148,8 +152,10 @@ loop = do
 
         unless quit loop
     where
+        snakeStateDir gameState = (snakeState gameState) {direction=nextSnakeDirection gameState}
+
         moveSnakeGameState gameState tick =
-                        gameState{ snakeState = (moveSnake (snakeState gameState))
+                        gameState {snakeState = (moveSnake (snakeStateDir gameState))
                                   ,lastSnakeMove = tick }
 
 drawGame = do

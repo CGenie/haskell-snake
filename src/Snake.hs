@@ -45,9 +45,12 @@ snakeEatsApple :: [Point] -> Point -> Bool
 snakeEatsApple snakePosition applePosition = applePosition `elem` snakePosition
 
 -- | Don't allow to change to opposite direction immediately
+tryChangeSnakeDirection :: Direction -> Direction -> Direction
+tryChangeSnakeDirection direction snakeDirection
+            | oppositeDirections direction snakeDirection = snakeDirection
+            | otherwise    = direction
+
 changeSnakeDirection :: SnakeState -> Direction -> SnakeState
-changeSnakeDirection snakeState dir
-            | oppositeDirections dir currentDirection = snakeState
-            | otherwise    = snakeState { direction = dir }
+changeSnakeDirection snakeState dir = snakeState {direction = tryChangeSnakeDirection dir currentDirection}
         where
             currentDirection = direction snakeState
