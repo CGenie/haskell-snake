@@ -120,23 +120,29 @@ loop = do
 
         let tickDifference = toInteger $ unsafeCoerce $ tick - (lastSnakeMove gameState)
 
-        if (tickDifference > speedFromLevel (level gameState)) then
-            if snakeEatsApple sp ap
-                then do
-                    newApplePosition <- liftIO $ getRandomApple (position (newSnakeState ss))
-                    -- start new level after apple is eaten
-                    put initialGameState {
-                            snakeState = newSnakeState ss
-                           ,applePosition = newApplePosition
-                           ,level = (level gameState) + 1}
-                    
-                else put (moveSnakeGameState gameState tick)
+        if (tickDifference > speedFromLevel (level gameState))
+            then
+                if snakeEatsApple sp ap
+                    then do
+                        newApplePosition <- liftIO $ getRandomApple (position ss)
+                        if (shouldIncreaseLevel ss)
+                            then
+                                -- start new level after apple is eaten
+                                put initialGameState {
+                                        snakeState = initialSnakeState
+                                       ,applePosition = newApplePosition
+                                       ,level = (level gameState) + 1}
+                            else
+                                -- increase snake's length
+                                put gameState {
+                                    snakeState = increaseSnakeLength ss
+                                   ,applePosition = newApplePosition}
+                        
+                    else put (moveSnakeGameState gameState tick)
             else return ()
 
         unless quit loop
     where
-        newSnakeState ss = initialSnakeState {
-                                len = ((len ss) + 1)}
         moveSnakeGameState gameState tick =
                         gameState{ snakeState = (moveSnake (snakeState gameState))
                                   ,lastSnakeMove = tick }

@@ -83,3 +83,7 @@ paintSnake gameScreen snakeState =
                       mapM_ (paintSnakePiece gameScreen . rectFromPoint) (position snakeState)
 
 speedFromLevel level = toInteger $ floor $ (380 * (0.5**(0.1 * (fromIntegral level))) + 20)
+
+-- if snake's length is greater than 10, then increase level
+shouldIncreaseLevel :: SnakeState -> Bool
+shouldIncreaseLevel snakeState = len snakeState >= 10
