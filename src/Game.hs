@@ -81,3 +81,5 @@ paintSnakePiece gameScreen rect = do
 paintSnake :: Surface -> SnakeState -> IO ()
 paintSnake gameScreen snakeState =
                       mapM_ (paintSnakePiece gameScreen . rectFromPoint) (position snakeState)
+
+speedFromLevel level = toInteger $ floor $ (380 * (0.5**(0.1 * (fromIntegral level))) + 20)

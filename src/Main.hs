@@ -7,6 +7,8 @@ import Board
 import Game
 import Snake
 
+import Unsafe.Coerce
+
 import Data.Word
 
 import Control.Applicative
@@ -116,7 +118,9 @@ loop = do
 
         tick <- liftIO getTicks
 
-        if (tick - (lastSnakeMove gameState) > 500 - 10*(fromIntegral $ level gameState)) then
+        let tickDifference = toInteger $ unsafeCoerce $ tick - (lastSnakeMove gameState)
+
+        if (tickDifference > speedFromLevel (level gameState)) then
             if snakeEatsApple sp ap
                 then do
                     newApplePosition <- liftIO $ getRandomApple (position (newSnakeState ss))
