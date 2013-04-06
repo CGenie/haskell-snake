@@ -128,20 +128,22 @@ loop = do
                 if snakeEatsApple sp ap
                     then do
                         newApplePosition <- liftIO $ getRandomApple (position ss)
-                        if (shouldIncreaseLevel ss)
-                            then
-                                -- start new level after apple is eaten
-                                put initialGameState {
-                                        snakeState = initialSnakeState
-                                       ,applePosition = newApplePosition
-                                       ,level = (level gameState) + 1}
-                            else
-                                -- increase snake's length
-                                put gameState {
-                                    snakeState = increaseSnakeLength ss
-                                   ,applePosition = newApplePosition}
+                        -- increase snake's length
+                        put gameState {
+                            snakeState = increaseSnakeLength ss
+                           ,applePosition = newApplePosition}
                         
                     else put (moveSnakeGameState gameState tick)
+            else return ()
+
+        if (shouldIncreaseLevel ss)
+            then do
+                newApplePosition <- liftIO $ getRandomApple (position initialSnakeState)
+                -- start new level after apple is eaten
+                put initialGameState {
+                        snakeState = initialSnakeState
+                       ,applePosition = newApplePosition
+                       ,level = (level gameState) + 1}
             else return ()
 
         unless quit loop
