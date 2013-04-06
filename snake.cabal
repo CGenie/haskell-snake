@@ -59,6 +59,7 @@ executable snake
   -- Other library packages from which modules are imported.
   build-depends:       base >=4.5.0.0 && <= 6,
                        SDL >= 0.6.3 && < 1,
+                       SDL-ttf >= 0.6.1 && < 1,
                        mtl >= 2.1.1 && < 4,
                        containers >= 0.4.2.1 && < 2,
                        random -any

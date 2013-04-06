@@ -8,7 +8,9 @@ import Data.Word
 
 import Control.Monad.State
 import Control.Monad.Reader
+
 import Graphics.UI.SDL as SDL
+import Graphics.UI.SDL.TTF
 
 screenWidth :: Int
 screenWidth   = 640
@@ -16,12 +18,16 @@ screenHeight :: Int
 screenHeight  = 480
 screenBpp :: Int
 screenBpp     = 32
+
 gameScreenWidth :: Int
---gameScreenWidth   = 540
-gameScreenWidth = screenWidth
+gameScreenWidth   = 540
 gameScreenHeight :: Int
---gameScreenHeight  = 400
-gameScreenHeight = screenHeight
+gameScreenHeight  = 400
+
+messageScreenWidth :: Int
+messageScreenWidth = screenWidth - gameScreenWidth
+messageScreenHeight :: Int
+messageScreenHeight = screenHeight - gameScreenHeight
 
 rectWidth :: Int
 rectWidth     = gameScreenWidth `div` numRectsX
@@ -87,3 +93,26 @@ speedFromLevel level = toInteger $ floor $ (380 * (0.5**(0.1 * (fromIntegral lev
 -- if snake's length is greater than 10, then increase level
 shouldIncreaseLevel :: SnakeState -> Bool
 shouldIncreaseLevel snakeState = len snakeState >= 10
+
+
+clearGameMessages screen = do
+                    let messagesRect = Rect gameScreenWidth 0 messageScreenWidth messageScreenHeight
+                    colorBlack <- (mapRGB . surfaceGetPixelFormat) screen 0x00 0x00 0x00
+                    fillRect screen (Just messagesRect) colorBlack
+
+--showGameMessages :: Surface -> IO ()
+showGameMessages screen gameState = do
+                    font <- openFont "liberation.ttf" 25
+
+                    msgBlit levelMessage (Rect (surfaceGetWidth screen - 100) 10 100 100) font
+
+                    msgBlit lengthMessage (Rect (surfaceGetWidth screen - 100) 50 100 100) font
+
+                where
+                    levelMessage = "Level " ++ (show $ level gameState)
+                    lengthMessage = "Length " ++ (show $ len $ snakeState gameState)
+
+                    renderMessage msg font = renderTextSolid font msg (Color 0xFF 0xFF 0xFF)
+                    msgBlit msg rect font = do
+                        rendered <- renderMessage msg font
+                        blitSurface rendered Nothing screen (Just rect)

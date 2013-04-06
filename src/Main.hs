@@ -18,6 +18,7 @@ import Control.Monad.State
 import Control.Monad.Reader
 
 import Graphics.UI.SDL as SDL
+import Graphics.UI.SDL.TTF as TTFG
 
 data MessageDir = MessageDir {
     quitMessage     :: Bool
@@ -75,6 +76,8 @@ main = withInit [InitEverything] $ do
 
 initEnv :: IO (AppConfig, GameState)
 initEnv = do
+    result <- TTFG.init
+
     screen <- setVideoMode screenWidth screenHeight screenBpp [SWSurface]
     gameScreen <- createRGBSurface [SWSurface] gameScreenWidth gameScreenHeight screenBpp 0 0 0 0
     setCaption "Haskell Snake" []
@@ -158,5 +161,8 @@ drawGame = do
         paintSnake gameScreen (snakeState gameState)
 
         blitSurface gameScreen Nothing screen Nothing
+
+        clearGameMessages screen
+        showGameMessages screen gameState
 
         SDL.flip screen
