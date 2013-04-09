@@ -59,7 +59,7 @@ executable snake
   main-is:           MainWrapper.hs
   ghc-options:       -no-hs-main 
   c-sources:         mainc.c
-  include-dirs:      /usr/local/include/SDL
+  include-dirs:      /usr/include/SDL
    
   -- Modules included in this executable, other than Main.
   other-modules:     Basic, Board, Game, Snake
