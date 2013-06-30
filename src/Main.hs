@@ -122,7 +122,7 @@ loop = do
 
         tick <- liftIO getTicks
 
-        let tickDifference = toInteger $ unsafeCoerce $ tick - (lastSnakeMove gameState)
+        let tickDifference = fromIntegral tick - fromIntegral (lastTick gameState)
 
         if (tickDifference > speedFromLevel (level gameState))
             then
