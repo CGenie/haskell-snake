@@ -52,3 +52,13 @@ getRandomApple snakePosition = do
                 return $ head $ filter (\pt -> (not . elem pt) snakePosition) pts
             where
                 modPoint (x, y) = Point ((x `mod` numRectsX) + 1) ((y `mod` numRectsY) + 1)
+
+-- | maps function to list, but only to specific indices
+mapToIndices :: (Eq a) => (a -> a) -> [a] -> [Int] -> [a]
+mapToIndices f xs ind = mapToIndices' f xs ind 0
+        where
+            mapToIndices' f' (x':xs') (ind':inds') i
+                | ind' == i    = (f' x':mapToIndices' f' xs' inds' (i + 1))
+                | otherwise    = (x':mapToIndices' f' xs' (ind':inds') (i + 1))
+            mapToIndices' f' [] _ _ = []
+            mapToIndices' f' xs' [] _ = xs'

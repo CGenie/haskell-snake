@@ -2,6 +2,7 @@ module Game where
 
 import Basic
 import Board
+import Player
 import Snake
 
 import Data.Word
@@ -35,23 +36,18 @@ rectHeight :: Int
 rectHeight    = gameScreenHeight `div` numRectsY
 
 data GameState = GameState {
-     snakeState         :: SnakeState,
-     -- | Temporary state variable to store next move's snake direction
-     --   Without this when snake went North, and user quickly typed
-     --   West, then South, snake would bump into itself
-     nextSnakeDirection :: Direction,
+     players            :: [Player],
      applePosition      :: Point,
      board              :: Board,
      level              :: Int,
-     lastSnakeMove      :: Word32
+     lastTick           :: Word32
 }
 
-initialGameState = GameState {snakeState = initialSnakeState
-                             ,nextSnakeDirection = direction initialSnakeState
+initialGameState = GameState {players = [initialPlayer, initialComputer]
                              ,applePosition = Point 0 0
                              ,board = initialBoard
                              ,level = 1
-                             ,lastSnakeMove = 0}
+                             ,lastTick = 0}
 
 rectFromPoint :: Point -> Maybe Rect
 rectFromPoint (Point x y) = 
@@ -89,15 +85,18 @@ paintSnakePiece gameScreen rect = do
                            fillRect gameScreen rect colorGreen
                            return ()
 
-paintSnake :: Surface -> SnakeState -> IO ()
-paintSnake gameScreen snakeState =
-                      mapM_ (paintSnakePiece gameScreen . rectFromPoint) (position snakeState)
+paintSnake :: Surface -> Snake -> IO ()
+paintSnake gameScreen snake =
+                      mapM_ (paintSnakePiece gameScreen . rectFromPoint) (position snake)
+
+paintPlayer :: Surface -> Player -> IO ()
+paintPlayer gameScreen player = paintSnake gameScreen (snake player)
 
 speedFromLevel level = toInteger $ floor $ (380 * (0.5**(0.1 * (fromIntegral level))) + 20)
 
 -- if snake's length is greater than 10, then increase level
-shouldIncreaseLevel :: SnakeState -> Bool
-shouldIncreaseLevel snakeState = len snakeState >= 10
+shouldIncreaseLevel :: [Player] -> Bool
+shouldIncreaseLevel ps = length (filter (>=10) (map (len . snake) ps)) > 0
 
 
 clearGameMessages screen = do
@@ -111,11 +110,11 @@ showGameMessages screen gameState = do
 
                     msgBlit levelMessage (Rect (surfaceGetWidth screen - 100) 10 100 100) font
 
-                    msgBlit lengthMessage (Rect (surfaceGetWidth screen - 100) 50 100 100) font
+                    --msgBlit lengthMessage (Rect (surfaceGetWidth screen - 100) 50 100 100) font
 
                 where
                     levelMessage = "Level " ++ (show $ level gameState)
-                    lengthMessage = "Length " ++ (show $ len $ snakeState gameState)
+                    --lengthMessage = "Length " ++ (show $ len $ snake gameState)
 
                     renderMessage msg font = renderTextSolid font msg (Color 0xFF 0xFF 0xFF)
                     msgBlit msg rect font = do
