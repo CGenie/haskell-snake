@@ -1,6 +1,8 @@
-{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleContexts, TemplateHaskell #-}
 
 module Main where
+
+import Control.Lens
 
 import AI
 import Basic
@@ -35,9 +37,6 @@ data AppConfig = AppConfig {
 
 type AppState = StateT GameState IO
 type AppEnv = ReaderT AppConfig AppState
-
-data Hole = Hole
-hole = undefined
 
 getScreen :: MonadReader AppConfig m => m Surface
 getScreen = liftM screen ask
@@ -76,21 +75,21 @@ handleInputHuman gs (KeyDown (Keysym key _ _)) =
                                         --return (direction $ snake pl)
                         SDLK_DOWN  -> do
                                    --return () --return South
-                                   put gs { players = moveHuman South }
+                                   put $ players .~ moveHuman South $ gs
                         SDLK_UP    -> do
                                    -- return () --return North
-                                   put gs { players = moveHuman North }
+                                   put $ players .~ moveHuman North $ gs
                         SDLK_LEFT  -> do
                                    --return () --return West
-                                   put gs { players = moveHuman West }
+                                   put $ players .~ moveHuman West $ gs
                         SDLK_RIGHT -> do
                                    --return () --return East
-                                   put gs { players = moveHuman East }
+                                   put $ players .~ moveHuman East $ gs
                         _          -> return () --return (direction $ snake pl)
                  where
-                   moveHuman dir = mapToIndices (\pl -> setNextPlayerDirection pl dir) (players gs) humanPlayerIndices
+                   moveHuman dir = mapToIndices (\pl -> setNextPlayerDirection pl dir) (gs^.players) humanPlayerIndices
                        where
-                            humanPlayerIndices = findIndices isHuman (players gs)
+                            humanPlayerIndices = findIndices isHuman (gs^.players)
 
 handleInputHuman gs _ = return () --return (direction $ snake pl)
 
@@ -127,36 +126,36 @@ initEnv = do
 
     let msgDir = MessageDir False 
 
-    applePosition <- getRandomApple initialSnakePosition
+    applePos <- getRandomApple initialSnakePosition
     tick <- getTicks
 
     return (AppConfig screen gameScreen msgDir,
-            initialGameState {applePosition = applePosition
-                             ,lastTick = tick}) -- timerState
+            applePosition .~ applePos $
+            lastTick .~ tick $ initialGameState) -- timerState
 
 updatePlayerDirections :: ReaderT AppConfig AppState ()
 updatePlayerDirections = do
            gameState <- get
-           put gameState { players = map updatePlayerDirection (players gameState) }
+           put $ players .~ map updatePlayerDirection (gameState^.players) $ gameState
 
 computeAINextMoves :: ReaderT AppConfig AppState ()
 computeAINextMoves = do
         gameState <- get
-        put gameState { players = movedAI gameState }
+        put $ players .~ movedAI gameState $ gameState
     where        
-        movedAI gs = mapToIndices (\pl -> setNextPlayerDirection pl (computeAIPlayerMove pl gs)) (players gs) (aiIndices gs)
+        movedAI gs = mapToIndices (\pl -> setNextPlayerDirection pl (computeAIPlayerMove pl gs)) (gs^.players) (aiIndices gs)
             where
-                aiIndices gs = findIndices (not . isHuman) (players gs)
+                aiIndices gs = findIndices (not . isHuman) (gs^.players)
 
 movePlayers :: ReaderT AppConfig AppState ()
 movePlayers = do
             gameState <- get
-            put gameState { players = map movePlayer (players gameState) }
+            put $  players .~ map movePlayer (gameState^.players) $ gameState
 
 increaseAppleEatersLength :: [Int] -> ReaderT AppConfig AppState ()
 increaseAppleEatersLength appleEatersIndices = do
             gameState <- get
-            put gameState { players = mapToIndices increasePlayerSnakeLength (players gameState) appleEatersIndices }
+            put $ players .~ mapToIndices increasePlayerSnakeLength (gameState^.players) appleEatersIndices $ gameState
 
 
 runLoop :: AppConfig -> GameState -> IO ()
@@ -173,8 +172,8 @@ loop = do
         gameScreen  <- gameScreen `liftM` ask
         messageDir  <- messageDir `liftM` ask
 
-        let ap = applePosition gameState
-        let ps = players gameState
+        let ap = gameState^.applePosition
+        let ps = gameState^.players
         --let ss = snakeState gameState
         --let sp = position ss
 
@@ -187,9 +186,9 @@ loop = do
 
         tick <- liftIO getTicks
 
-        let tickDifference = fromIntegral tick - fromIntegral (lastTick gameState)
+        let tickDifference = fromIntegral tick - fromIntegral (gameState^.lastTick)
 
-        if (tickDifference > speedFromLevel (level gameState))
+        if (tickDifference > speedFromLevel (gameState^.level))
             then
                 do
                     -- Move the snake first, only then check for apple eating.
@@ -198,7 +197,7 @@ loop = do
                     updatePlayerDirections
                     movePlayers
                     gameState <- get
-                    put gameState { lastTick = tick }
+                    put $ lastTick .~ tick $ gameState
 
                     let appleEatersInd = findIndices (playerEatsApple ap) ps
                     if (length appleEatersInd > 0)
@@ -207,7 +206,7 @@ loop = do
                             -- increase snake's length
                             increaseAppleEatersLength appleEatersInd
                             gameState <- get
-                            put gameState { applePosition = newApplePosition }
+                            put $ applePosition .~ newApplePosition $ gameState
                             
                         else return ()
             else return ()
@@ -216,10 +215,8 @@ loop = do
             then do
                 newApplePosition <- liftIO $ getRandomApple (totalPlayersPosition ps)
                 -- start new level after apple is eaten
-                put initialGameState {
-                        players = [initialPlayer]
-                       ,applePosition = newApplePosition
-                       ,level = (level gameState) + 1}
+                put $ applePosition .~ newApplePosition $
+                      level .~ (gameState^.level) + 1 $ initialGameState
             else return ()
 
         unless quit loop
@@ -231,8 +228,8 @@ drawGame = do
 
     liftIO $ do
         paintBoard gameScreen
-        paintApple gameScreen (applePosition gameState)
-        mapM_ (paintPlayer gameScreen) (players gameState)
+        paintApple gameScreen (gameState^.applePosition)
+        mapM_ (paintPlayer gameScreen) (gameState^.players)
 
         blitSurface gameScreen Nothing screen Nothing
 

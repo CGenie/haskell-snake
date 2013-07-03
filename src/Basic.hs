@@ -1,6 +1,9 @@
 -- Basic.hs -- basic functions and datatypes
+{-# LANGUAGE TemplateHaskell #-}
 
 module Basic where
+
+import Control.Lens
 
 import Data.List
 import System.Random
@@ -8,12 +11,15 @@ import System.Random
 data Colors = White | Black
 
 data Point = Point {
-     x          :: Int,
-     y          :: Int
+     _x          :: Int,
+     _y          :: Int
 } deriving (Show, Eq, Ord)
 
+makeLenses ''Point
+
 infixl 6 |+|
-(Point x1 y1) |+| (Point x2 y2) = Point (x1 + x2) (y1 + y2)
+(|+|) :: Point -> Point -> Point
+pt1 |+| pt2 = Point (pt1^.x + pt2^.x) (pt1^.y + pt2^.y)
 
 data Direction = North | South | East | West
      deriving (Show, Eq, Ord)

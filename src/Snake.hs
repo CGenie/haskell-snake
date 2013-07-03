@@ -1,6 +1,9 @@
 -- Snake.hs: Snake-control logic
+{-# LANGUAGE TemplateHaskell #-}
 
 module Snake where
+
+import Control.Lens
 
 import Basic
 
@@ -9,33 +12,36 @@ import Data.List (nub, sort)
 data Snake = Snake {
     -- | Snake's position is a list containing all its elements.
     -- The first element of this list is snake's head.
-    position    :: [Point],
-    direction   :: Direction,
+    _position    :: [Point],
+    _direction   :: Direction,
     -- | Snake's length
-    len         :: Int
+    _len         :: Int
 } deriving (Show, Eq)
+
+makeLenses ''Snake
 
 -- | Increases snake's length by 1
 increaseSnakeLength :: Snake -> Snake
-increaseSnakeLength (Snake position direction len) = Snake position direction (len + 1)
+increaseSnakeLength snake = len +~ 1 $ snake
 
 -- | Moves snake according to it's direction
 moveSnake :: Snake -> Snake
-moveSnake (Snake position direction len) = Snake (newPosition) direction len
-                               where
-                                newPosition = take len
-                                                   ((head position |+| directionToPoint direction) : position)
-                                -- check snake's length, if newPosition contains too many elements, remove them
+moveSnake snake = position .~ newPosition $ snake
+             where
+                -- |check snake's length, if newPosition contains too many elements, remove them
+                newPosition = take (snake^.len)
+                    ((head (snake^.position) |+| directionToPoint (snake^.direction)) :
+                     (snake^.position))
 
 -- | Basically we check if there are 2 same elements in the 'position' list
 checkCollision :: Snake -> Bool
 checkCollision snake = outOfBoundary || selfCollision
                 where
-                    snakePosition = position snake
+                    snakePosition = snake^.position
                     mini          = head $ sort snakePosition
                     maxi          = head $ reverse $ sort snakePosition
-                    outOfBoundary = (x mini < 1) || (y mini < 1) ||
-                                    (x maxi > numRectsX) || (y maxi > numRectsY)
+                    outOfBoundary = (mini^.x < 1) || (mini^.y < 1) ||
+                                    (maxi^.x > numRectsX) || (maxi^.y > numRectsY)
                     selfCollision = (length (nub snakePosition)) /= (length snakePosition)
 
 -- | Starting position & body
@@ -45,7 +51,7 @@ initialSnake = Snake initialSnakePosition North 1
 initialSnakeBottom = Snake initialSnakePositionBottom North 1
 
 snakeEatsApple :: Snake -> Point -> Bool
-snakeEatsApple snake apple = apple `elem` (position snake)
+snakeEatsApple snake apple = apple `elem` (snake^.position)
 
 -- | Don't allow to change to opposite direction immediately
 tryChangeSnakeDirection :: Direction -> Direction -> Direction
@@ -54,6 +60,4 @@ tryChangeSnakeDirection direction snakeDirection
             | otherwise    = direction
 
 changeSnakeDirection :: Snake -> Direction -> Snake
-changeSnakeDirection snake dir = snake {direction = tryChangeSnakeDirection dir currentDirection}
-        where
-            currentDirection = direction snake
+changeSnakeDirection snake dir = direction .~ (tryChangeSnakeDirection dir (snake^.direction)) $ snake

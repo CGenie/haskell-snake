@@ -57,8 +57,9 @@ executable snake
   -- .hs or .lhs file containing the Main module.
   hs-source-dirs:    src
   main-is:           MainWrapper.hs
-  ghc-options:       -no-hs-main 
-  c-sources:         mainc.c
+  ghc-options:       -O2
+  ---no-hs-main 
+  --c-sources:         mainc.c
   include-dirs:      /usr/include/SDL
    
   -- Modules included in this executable, other than Main.
@@ -70,13 +71,15 @@ executable snake
                        SDL-ttf >= 0.6.1 && < 1,
                        mtl >= 2.1.1 && < 4,
                        containers >= 0.4.2.1 && < 2,
+                       lens >= 3.9,
+                       template-haskell >= 2.4,
                        random -any
 
 Test-suite snake-test
   Hs-Source-Dirs:      Tests, src, .
-  Main-Is: 	       testsuite.hs
+  Main-Is:             testsuite.hs
   other-modules:       TestSnake
-  Type:	 	       exitcode-stdio-1.0
+  Type:                exitcode-stdio-1.0
   build-depends:       base,
                        QuickCheck >= 2.5.1,
                        containers >= 0.5.2

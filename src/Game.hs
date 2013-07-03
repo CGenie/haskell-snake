@@ -1,4 +1,8 @@
+{-# LANGUAGE TemplateHaskell #-}
+
 module Game where
+
+import Control.Lens
 
 import Basic
 import Board
@@ -36,18 +40,20 @@ rectHeight :: Int
 rectHeight    = gameScreenHeight `div` numRectsY
 
 data GameState = GameState {
-     players            :: [Player],
-     applePosition      :: Point,
-     board              :: Board,
-     level              :: Int,
-     lastTick           :: Word32
+     _players            :: [Player],
+     _applePosition      :: Point,
+     _board              :: Board,
+     _level              :: Int,
+     _lastTick           :: Word32
 }
+makeLenses ''GameState
 
-initialGameState = GameState {players = [initialPlayer, initialComputer]
-                             ,applePosition = Point 0 0
-                             ,board = initialBoard
-                             ,level = 1
-                             ,lastTick = 0}
+initialGameState = GameState
+                 [initialPlayer, initialComputer]
+                 (Point 0 0)
+                 initialBoard
+                 1
+                 0
 
 rectFromPoint :: Point -> Maybe Rect
 rectFromPoint (Point x y) = 
@@ -87,16 +93,16 @@ paintSnakePiece gameScreen rect = do
 
 paintSnake :: Surface -> Snake -> IO ()
 paintSnake gameScreen snake =
-                      mapM_ (paintSnakePiece gameScreen . rectFromPoint) (position snake)
+                      mapM_ (paintSnakePiece gameScreen . rectFromPoint) (snake^.position)
 
 paintPlayer :: Surface -> Player -> IO ()
-paintPlayer gameScreen player = paintSnake gameScreen (snake player)
+paintPlayer gameScreen player = paintSnake gameScreen (player^.snake)
 
 speedFromLevel level = toInteger $ floor $ (380 * (0.5**(0.1 * (fromIntegral level))) + 20)
 
 -- if snake's length is greater than 10, then increase level
 shouldIncreaseLevel :: [Player] -> Bool
-shouldIncreaseLevel ps = length (filter (>=10) (map (len . snake) ps)) > 0
+shouldIncreaseLevel ps = length (filter (>=10) (map (\pl -> pl^.snake^.len) ps)) > 0
 
 
 clearGameMessages screen = do
@@ -113,7 +119,7 @@ showGameMessages screen gameState = do
                     --msgBlit lengthMessage (Rect (surfaceGetWidth screen - 100) 50 100 100) font
 
                 where
-                    levelMessage = "Level " ++ (show $ level gameState)
+                    levelMessage = "Level " ++ (show $ gameState^.level)
                     --lengthMessage = "Length " ++ (show $ len $ snake gameState)
 
                     renderMessage msg font = renderTextSolid font msg (Color 0xFF 0xFF 0xFF)
