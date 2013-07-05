@@ -15,9 +15,11 @@ data PlayerType = AI | Human
 data Player = Player {
     _playerType         :: PlayerType
    ,_snake              :: Snake
-     -- | Temporary state variable to store next move's snake direction
-     --   Without this when snake went North, and user quickly typed
-     --   West, then South, snake would bump into itself
+     {-|
+          Temporary state variable to store next move's snake direction
+          Without this when snake went North, and user quickly typed
+          West, then South, snake would bump into itself
+     -}
    ,_nextSnakeDirection :: Direction
 } deriving (Eq, Show)
 

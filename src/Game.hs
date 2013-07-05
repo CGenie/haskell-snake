@@ -95,6 +95,7 @@ paintSnake :: Surface -> Snake -> IO ()
 paintSnake gameScreen snake =
                       mapM_ (paintSnakePiece gameScreen . rectFromPoint) (snake^.position)
 
+-- | TODO: paint different snakes with different colors
 paintPlayer :: Surface -> Player -> IO ()
 paintPlayer gameScreen player = paintSnake gameScreen (player^.snake)
 
@@ -110,17 +111,14 @@ clearGameMessages screen = do
                     colorBlack <- (mapRGB . surfaceGetPixelFormat) screen 0x00 0x00 0x00
                     fillRect screen (Just messagesRect) colorBlack
 
---showGameMessages :: Surface -> IO ()
+showGameMessages :: Surface -> GameState -> IO Bool
 showGameMessages screen gameState = do
                     font <- openFont "liberation.ttf" 25
 
                     msgBlit levelMessage (Rect (surfaceGetWidth screen - 100) 10 100 100) font
 
-                    --msgBlit lengthMessage (Rect (surfaceGetWidth screen - 100) 50 100 100) font
-
                 where
                     levelMessage = "Level " ++ (show $ gameState^.level)
-                    --lengthMessage = "Length " ++ (show $ len $ snake gameState)
 
                     renderMessage msg font = renderTextSolid font msg (Color 0xFF 0xFF 0xFF)
                     msgBlit msg rect font = do

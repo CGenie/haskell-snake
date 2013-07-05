@@ -22,7 +22,7 @@ makeLenses ''Snake
 
 -- | Increases snake's length by 1
 increaseSnakeLength :: Snake -> Snake
-increaseSnakeLength snake = len +~ 1 $ snake
+increaseSnakeLength = len +~ 1
 
 -- | Moves snake according to it's direction
 moveSnake :: Snake -> Snake

@@ -44,54 +44,26 @@ getScreen = liftM screen ask
 getGameScreen :: MonadReader AppConfig m => m Surface
 getGameScreen = liftM gameScreen ask
 
---handleInput :: (MonadIO m, MonadState GameState m) => Event -> m ()
---handleInput (KeyDown (Keysym key _ _)) =
---                    case key of
---                        SDLK_a     -> liftIO $ setCaption "asdf" []
---                        SDLK_q     -> liftIO $ pushEvent Quit
---                        SDLK_DOWN  -> changeNextSnakeDirection South
---                        SDLK_UP    -> changeNextSnakeDirection North
---                        SDLK_LEFT  -> changeNextSnakeDirection West
---                        SDLK_RIGHT -> changeNextSnakeDirection East
---                        _          -> return ()
---                where
---                    changeNextSnakeDirection dir = do
---                        gameState <- get
---                        snake <- snake `liftM` get
---                        put gameState {snakeState = changeSnakeDirection snakeState direction }
---                        put gameState {nextSnakeDirection = tryChangeSnakeDirection dir (direction snake)}
-
---handleInput _ = return ()
-
 handleInputHuman :: GameState -> Event -> ReaderT AppConfig AppState ()
 handleInputHuman gs (KeyDown (Keysym key _ _)) =
                     case key of
-                        -- TODO: remove this, was just for testing
-                        SDLK_a     -> do
-                                        liftIO $ setCaption "asdf" []
-                                        --return (direction $ snake pl)
                         SDLK_q     -> do
                                         liftIO $ pushEvent Quit
-                                        --return (direction $ snake pl)
                         SDLK_DOWN  -> do
-                                   --return () --return South
                                    put $ players .~ moveHuman South $ gs
                         SDLK_UP    -> do
-                                   -- return () --return North
                                    put $ players .~ moveHuman North $ gs
                         SDLK_LEFT  -> do
-                                   --return () --return West
                                    put $ players .~ moveHuman West $ gs
                         SDLK_RIGHT -> do
-                                   --return () --return East
                                    put $ players .~ moveHuman East $ gs
-                        _          -> return () --return (direction $ snake pl)
+                        _          -> return ()
                  where
                    moveHuman dir = mapToIndices (\pl -> setNextPlayerDirection pl dir) (gs^.players) humanPlayerIndices
                        where
                             humanPlayerIndices = findIndices isHuman (gs^.players)
 
-handleInputHuman gs _ = return () --return (direction $ snake pl)
+handleInputHuman gs _ = return ()
 
 -- | poll for event until it is Quit or NoEvent
 whileEvents :: MonadIO m => (Event -> m ()) -> m Bool
@@ -174,8 +146,6 @@ loop = do
 
         let ap = gameState^.applePosition
         let ps = gameState^.players
-        --let ss = snakeState gameState
-        --let sp = position ss
 
         drawGame
 
