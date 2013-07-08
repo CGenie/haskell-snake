@@ -6,18 +6,12 @@ import Control.Lens
 
 import AI
 import Basic
-import Board
 import Game
 import Player
 import Snake
 
-import Unsafe.Coerce
-
 import Data.List
-import Data.Word
 
-import Control.Applicative
-import Control.Concurrent (threadDelay)
 import Control.Monad
 import Control.Monad.State
 import Control.Monad.Reader
@@ -191,6 +185,7 @@ loop = do
 
         unless quit loop
 
+drawGame :: ReaderT AppConfig AppState ()
 drawGame = do
     screen      <- screen `liftM` ask
     gameScreen  <- gameScreen `liftM` ask
