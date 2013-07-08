@@ -143,7 +143,7 @@ loop = do
 
         drawGame
 
-        if (length (filter checkPlayerCollision ps) > 0)
+        if checkPlayersCollision ps
             -- TODO: increase level
             then error "Game over"
             else return ()

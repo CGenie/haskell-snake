@@ -53,8 +53,15 @@ movePlayer pl = snake .~ (moveSnake $ pl^.snake) $ pl
 playerEatsApple :: Point -> Player -> Bool
 playerEatsApple apple player = snakeEatsApple (player^.snake) apple
 
+sumPlayersPosition :: [Player] -> [Point]
+sumPlayersPosition ps = foldl (++) [] $ map (\pl -> pl^.snake^.position) ps
+
 totalPlayersPosition :: [Player] -> [Point]
-totalPlayersPosition pls = nub $ foldl (++) [] $ map (\pl -> pl^.snake^.position) pls
+totalPlayersPosition = nub . sumPlayersPosition
+
+checkPlayersCollision :: [Player] -> Bool
+checkPlayersCollision ps = (length (filter checkPlayerCollision ps) > 0) ||
+                          (length (totalPlayersPosition ps) < (length (sumPlayersPosition ps)))
 
 increasePlayerSnakeLength :: Player -> Player
 increasePlayerSnakeLength pl = snake .~ (increaseSnakeLength $ pl^.snake) $ pl
