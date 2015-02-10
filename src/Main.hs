@@ -39,10 +39,10 @@ getGameScreen :: MonadReader AppConfig m => m Surface
 getGameScreen = liftM gameScreen ask
 
 handleInputHuman :: GameState -> Event -> ReaderT AppConfig AppState ()
-handleInputHuman gs (KeyDown (Keysym key _ _)) =
+handleInputHuman gs (KeyboardEvent (SDL_KEYDOWN _ _ _ _ (Keysym _ key _))) =
                     case key of
                         SDLK_q     -> do
-                                        liftIO $ pushEvent Quit
+                                        liftIO $ pushEvent SDL_QUIT
                         SDLK_DOWN  -> do
                                    put $ players .~ moveHuman South $ gs
                         SDLK_UP    -> do
@@ -59,13 +59,13 @@ handleInputHuman gs (KeyDown (Keysym key _ _)) =
 
 handleInputHuman gs _ = return ()
 
--- | poll for event until it is Quit or NoEvent
+-- | poll for event until it is SDL_QUIT or NoEvent
 whileEvents :: MonadIO m => (Event -> m ()) -> m Bool
 whileEvents act = do
     event <- liftIO pollEvent
     case event of
-        Quit      -> return True
-        NoEvent   -> return False
+        SDL_QUIT      -> return True
+        --NoEvent   -> return False
         _         -> do
             act event
             whileEvents act
