@@ -1,0 +1,76 @@
+-- This file has been generated from package.yaml by hpack version 0.27.0.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: 192b2c53b1c47172c4eb5a55573b1c4f70e7f7b0154cf198cf6d353efb1a6134
+
+name:           haskell-snake
+version:        1.0.0
+synopsis:       Snake game implemetation in Haskell using SDL2
+description:    See README at <https://github.com/CGenie/haskell-snake>
+category:       Games
+homepage:       https://github.com/CGenie/haskell-snake#readme
+bug-reports:    https://github.com/CGenie/haskell-snake/issues
+maintainer:     Przemysław Kamiński <cgenie@gmail.com>
+license:        GPL-3
+license-file:   LICENSE
+build-type:     Simple
+cabal-version:  >= 1.10
+
+extra-source-files:
+    CHANGELOG.md
+
+source-repository head
+  type: git
+  location: https://github.com/CGenie/haskell-snake
+
+library
+  exposed-modules:
+      HSnake.AI
+      HSnake.Basic
+      HSnake.Board
+      HSnake.Game
+      HSnake.Graphics
+      HSnake.Player
+      HSnake.Snake
+  other-modules:
+      Paths_haskell_snake
+  hs-source-dirs:
+      src
+  default-extensions: EmptyCase FlexibleContexts FlexibleInstances InstanceSigs MultiParamTypeClasses LambdaCase MultiWayIf NamedFieldPuns TupleSections DeriveFoldable DeriveFunctor DeriveGeneric DeriveLift DeriveTraversable DerivingStrategies GeneralizedNewtypeDeriving StandaloneDeriving BangPatterns KindSignatures TypeOperators OverloadedStrings ScopedTypeVariables TypeApplications ConstraintKinds RankNTypes DefaultSignatures PatternSynonyms TemplateHaskell
+  ghc-options: -Wall -Wincomplete-patterns -Wincomplete-uni-patterns -Wredundant-constraints
+  build-depends:
+      base >=4.9 && <5
+    , containers
+    , lens
+    , linear
+    , mtl
+    , random
+    , sdl2
+    , sdl2-ttf
+    , text
+    , vector
+  default-language: Haskell2010
+
+executable haskell-snake
+  main-is: Main.hs
+  other-modules:
+      MainWrapper
+      Paths_haskell_snake
+  hs-source-dirs:
+      driver
+  default-extensions: EmptyCase FlexibleContexts FlexibleInstances InstanceSigs MultiParamTypeClasses LambdaCase MultiWayIf NamedFieldPuns TupleSections DeriveFoldable DeriveFunctor DeriveGeneric DeriveLift DeriveTraversable DerivingStrategies GeneralizedNewtypeDeriving StandaloneDeriving BangPatterns KindSignatures TypeOperators OverloadedStrings ScopedTypeVariables TypeApplications ConstraintKinds RankNTypes DefaultSignatures PatternSynonyms TemplateHaskell
+  ghc-options: -Wall -Wincomplete-patterns -Wincomplete-uni-patterns -Wredundant-constraints
+  build-depends:
+      base >=4.9 && <5
+    , containers
+    , haskell-snake
+    , lens
+    , linear
+    , mtl
+    , random
+    , sdl2
+    , sdl2-ttf
+    , text
+    , vector
+  default-language: Haskell2010

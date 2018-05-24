@@ -1,11 +1,9 @@
 -- Board.hs -- board logic
-{-# LANGUAGE TemplateHaskell #-}
-
-module Board where
+module HSnake.Board where
 
 import Control.Lens
 
-import Basic
+import HSnake.Basic
 
 data Board = Board {
      _xSize   :: Int,

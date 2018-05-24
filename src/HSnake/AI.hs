@@ -1,13 +1,11 @@
-{-# LANGUAGE TemplateHaskell #-}
-
-module AI where
+module HSnake.AI where
 
 import Control.Lens
 
-import Basic
-import Game
-import Player
-import Snake
+import HSnake.Basic
+import HSnake.Game
+import HSnake.Player
+import HSnake.Snake
 
 computeAIPlayerMove :: Player -> GameState -> Direction
 computeAIPlayerMove pl gameState = circleAIPlayer pl
@@ -25,7 +23,7 @@ circleAIPlayer pl
     | headPos^.y == (numRectsY - 1) && dir == South && headPos^.x >= 2  = West
     | headPos^.y == (numRectsY - 1) && dir == South && headPos^.x < 2   = East
     -- normal operation
-    | headPos^.y <= 2                                                   = South 
+    | headPos^.y <= 2                                                   = South
     | headPos^.y >= (numRectsX - 2)                                     = North
     | headPos^.y <= 2                                                   = West
     | headPos^.y >= (numRectsY - 2)                                     = East

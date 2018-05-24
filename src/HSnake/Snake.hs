@@ -1,11 +1,9 @@
 -- Snake.hs: Snake-control logic
-{-# LANGUAGE TemplateHaskell #-}
-
-module Snake where
+module HSnake.Snake where
 
 import Control.Lens
 
-import Basic
+import HSnake.Basic
 
 import Data.List (nub, sort)
 

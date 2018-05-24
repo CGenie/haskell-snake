@@ -1,6 +1,4 @@
-{-# LANGUAGE TemplateHaskell #-}
-
-module Game where
+module GameOld where
 
 import Control.Lens
 
@@ -18,8 +16,11 @@ import Data.Word
 import Control.Monad.State
 import Control.Monad.Reader
 
-import Graphics.UI.SDL as SDL
-import Graphics.UI.SDL.TTF
+import qualified SDL
+import SDL.Raw.Types (Rect(..), Surface(..), surfaceW, surfaceFormat)
+--import SDL.Video.Renderer(surfaceBlit)
+import SDL.Raw.Video (fillRect, mapRGB)
+import qualified SDL.Font as SDLF
 
 screenWidth :: Int
 screenWidth   = 640
@@ -128,16 +129,20 @@ clearGameMessages screen = do
 
 showGameMessages :: Surface -> GameState -> IO CInt
 showGameMessages screen gameState = do
-                    font <- openFont "liberation.ttf" 25
+                    font <- SDLF.load "liberation.ttf" 25
 
-                    msgBlit levelMessage (Rect (surfaceW screen - 100) 10 100 100) font
+                    let rect = Rect (surfaceW screen - 100) 10 100 100
+
+                    msgBlit levelMessage rect font
 
                 where
                     levelMessage = "Level " ++ (show $ gameState^.level)
 
-                    renderMessage msg font = renderTextSolid font msg (Color 0xFF 0xFF 0xFF 0xFF)
+                    color = SDL.V4 0xFF 0xFF 0xFF 0xFF :: SDLF.Color
+
+                    renderMessage msg font = SDLF.solid font color msg
                     msgBlit msg rect font = do
                         rendered <- renderMessage msg font
                         rectPtr <- new rect
                         screenPtr <- new screen
-                        blitSurface rendered nullPtr screenPtr rectPtr
+                        SDL.surfaceBlit rendered nullPtr screenPtr (Just rectPtr)

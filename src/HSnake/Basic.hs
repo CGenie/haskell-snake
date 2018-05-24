@@ -1,14 +1,14 @@
 -- Basic.hs -- basic functions and datatypes
-{-# LANGUAGE TemplateHaskell #-}
-
-module Basic where
+module HSnake.Basic where
 
 import Control.Lens
 
 import Data.List
 import System.Random
 
-data Colors = White | Black
+--data Colors = White | Black
+
+data Colour = White | Red | Blue | Green | Yellow | Black
 
 data Point = Point {
      _x          :: Int,

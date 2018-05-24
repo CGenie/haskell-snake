@@ -1,5 +1,3 @@
-{-# LANGUAGE FlexibleContexts, TemplateHaskell #-}
-
 module Main where
 
 import Control.Lens
@@ -16,8 +14,14 @@ import Control.Monad
 import Control.Monad.State
 import Control.Monad.Reader
 
-import Graphics.UI.SDL as SDL
-import Graphics.UI.SDL.TTF as TTFG
+import qualified SDL
+import SDL.Init (initialize, InitFlag(..))
+import SDL.Raw.Event (pollEvent, pushEvent)
+import SDL.Raw.Types (Event(..), Keysym(..), Rect(..), Surface(..), surfaceW, surfaceFormat)
+import SDL.Raw.Enum
+import SDL.Raw.Video (createWindow)
+--import qualified SDL.TTF as TTFG
+import qualified Graphics.UI.SDL.TTF as TTFG
 
 data MessageDir = MessageDir {
     quitMessage     :: Bool
@@ -70,7 +74,9 @@ whileEvents act = do
             act event
             whileEvents act
 
-main = withInit [InitEverything] $ do
+main = do
+    --withInit [InitEverything] $ do
+    initialize [InitEverything]
 
     (env, snakeState) <- initEnv
 
@@ -81,7 +87,8 @@ initEnv :: IO (AppConfig, GameState)
 initEnv = do
     result <- TTFG.init
 
-    screen <- setVideoMode screenWidth screenHeight screenBpp [SWSurface]
+    --screen <- setVideoMode screenWidth screenHeight screenBpp [SWSurface]
+    screen <- createWindow screenWidth screenHeight screenBpp [SWSurface]
     gameScreen <- createRGBSurface [SWSurface] gameScreenWidth gameScreenHeight screenBpp 0 0 0 0
     setCaption "Haskell Snake" []
 
@@ -90,7 +97,7 @@ initEnv = do
 
     paintBoard gameScreen
 
-    let msgDir = MessageDir False 
+    let msgDir = MessageDir False
 
     applePos <- getRandomApple initialSnakePosition
     tick <- getTicks
@@ -108,7 +115,7 @@ computeAINextMoves :: ReaderT AppConfig AppState ()
 computeAINextMoves = do
         gameState <- get
         put $ players .~ movedAI gameState $ gameState
-    where        
+    where
         movedAI gs = mapToIndices (\pl -> setNextPlayerDirection pl (computeAIPlayerMove pl gs)) (gs^.players) (aiIndices gs)
             where
                 aiIndices gs = findIndices (not . isHuman) (gs^.players)

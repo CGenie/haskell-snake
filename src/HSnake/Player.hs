@@ -1,11 +1,9 @@
-{-# LANGUAGE TemplateHaskell #-}
-
-module Player where
+module HSnake.Player where
 
 import Control.Lens
 
-import Basic
-import Snake
+import HSnake.Basic
+import HSnake.Snake
 
 import Data.List
 

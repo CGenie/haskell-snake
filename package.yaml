@@ -1,0 +1,82 @@
+name: haskell-snake
+version: 1.0.0
+synopsis: Snake game implemetation in Haskell using SDL2
+description: See README at <https://github.com/CGenie/haskell-snake>
+maintainer: Przemysław Kamiński <cgenie@gmail.com>
+license: GPL-3
+github: CGenie/haskell-snake
+category: Games
+extra-source-files:
+  - CHANGELOG.md
+
+ghc-options: -Wall -Wincomplete-patterns -Wincomplete-uni-patterns -Wredundant-constraints
+
+default-extensions:
+  - EmptyCase
+  - FlexibleContexts
+  - FlexibleInstances
+  - InstanceSigs
+  - MultiParamTypeClasses
+  - LambdaCase
+  - MultiWayIf
+  - NamedFieldPuns
+  - TupleSections
+  - DeriveFoldable
+  - DeriveFunctor
+  - DeriveGeneric
+  - DeriveLift
+  - DeriveTraversable
+  - DerivingStrategies
+  - GeneralizedNewtypeDeriving
+  - StandaloneDeriving
+  - BangPatterns
+  - KindSignatures
+  - TypeOperators
+  - OverloadedStrings
+  - ScopedTypeVariables
+  - TypeApplications
+  - ConstraintKinds
+  - RankNTypes
+  #- ApplicativeDo
+  - DefaultSignatures
+  - PatternSynonyms
+
+  - TemplateHaskell  # lens
+
+dependencies:
+  - base >= 4.9 && < 5
+  - containers
+  - lens
+  - linear
+  - mtl
+  - random
+  - sdl2
+  - sdl2-ttf
+  - text
+  - vector
+
+library:
+  source-dirs: src
+  exposed-modules:
+    - HSnake.AI
+    - HSnake.Basic
+    - HSnake.Board
+    - HSnake.Game
+    - HSnake.Graphics
+    - HSnake.Player
+    - HSnake.Snake
+
+executable:
+  main: Main.hs
+  source-dirs: driver
+  dependencies:
+    - haskell-snake
+
+#tests:
+#  spec:
+#    main: TestSnake.hs
+#    source-dirs:
+#      - test
+#      - src
+#    dependencies:
+#      - QuickCheck
