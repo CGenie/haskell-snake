@@ -104,8 +104,6 @@ loop = do
 
   gameState <- get
 
-  drawGame
-
   let ap = gameState^.applePosition
   let ps = gameState^.players
 
@@ -128,6 +126,8 @@ loop = do
               movePlayers
               gameState <- get
               put $ lastTick .~ tick $ gameState
+
+              drawGame
 
               let appleEatersInd = findIndices (playerEatsApple ap) ps
               if (length appleEatersInd > 0)
