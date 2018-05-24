@@ -13,6 +13,9 @@ data Snake = Snake {
     _position    :: [Point],
     _direction   :: Direction,
     -- | Snake's length
+    -- We need to keep it -- if we initialize new level with large
+    -- snake length, we initially get a shorter snake so
+    -- snake^.position is not the correct snake's measure
     _len         :: Int
 } deriving (Show, Eq)
 

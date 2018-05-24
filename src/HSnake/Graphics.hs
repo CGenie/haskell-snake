@@ -80,7 +80,6 @@ paintRects r color = do
 
 paintBoard :: SDL.Renderer -> IO ()
 paintBoard r = do
-  clearScreen r
   paintRects r White
 
 paintApple :: SDL.Renderer -> HSnake.Basic.Point -> IO ()
@@ -90,19 +89,18 @@ paintApple r ap = do
   where
     rect = rectFromPoint ap
 
-
 -- | TODO: paint different snakes with different colors
 paintPlayer :: SDL.Renderer -> Player -> IO ()
-paintPlayer r p = paintSnake r (p^.snake)
+paintPlayer r p = paintSnake r (p^.snake) (p^.colour)
 
 
-paintSnake :: SDL.Renderer -> Snake -> IO ()
-paintSnake r snake =
-  mapM_ (paintSnakePiece r . rectFromPoint) (snake^.position)
+paintSnake :: SDL.Renderer -> Snake -> Colour -> IO ()
+paintSnake r s c =
+  mapM_ (\p -> paintSnakePiece r (rectFromPoint p) c) (s^.position)
 
-paintSnakePiece :: SDL.Renderer -> SDLRect -> IO ()
-paintSnakePiece r rect = do
-  setColor r Green
+paintSnakePiece :: SDL.Renderer -> SDLRect -> Colour -> IO ()
+paintSnakePiece r rect c = do
+  setColor r c
   SDL.fillRect r $ Just rect
 
 showGameMessages :: SDL.Window -> GameState -> IO ()
@@ -123,16 +121,18 @@ showGameMessages w gameState = do
     levelMessage = pack $ "Level " ++ (show $ gameState^.level)
     color = sdlColor White
     root = "/home/przemek/git-work/github/Haskell/haskell-snake"
-    startPoint = P $ V2 (fromIntegral gameScreenWidth) (fromIntegral gameScreenHeight)
+    startPoint = P $ V2 (fromIntegral gameScreenWidth) 0
 
 renderSurfaceToWindow :: (MonadIO m) => SDL.Window -> SDL.Surface -> SDL.Surface -> (SDL.Point V2 CInt) -> m ()
 renderSurfaceToWindow w s i startPoint = do
-  dimensions <- SDL.surfaceDimensions s
   SDL.surfaceBlit i Nothing s (Just startPoint)
   return ()
-  --SDL.updateWindowSurface w
 
 clearScreen :: SDL.Renderer -> IO ()
 clearScreen r = do
   setColor r Black
   SDL.clear r
+
+clearSurface :: SDL.Surface -> IO ()
+clearSurface s = do
+  SDL.surfaceFillRect s Nothing (sdlColor Black)

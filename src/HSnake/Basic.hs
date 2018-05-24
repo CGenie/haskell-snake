@@ -9,6 +9,7 @@ import System.Random
 --data Colors = White | Black
 
 data Colour = White | Red | Blue | Green | Yellow | Black
+  deriving (Eq, Show)
 
 data Point = Point {
      _x          :: Int,

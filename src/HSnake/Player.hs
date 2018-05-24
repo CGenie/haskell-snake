@@ -19,28 +19,32 @@ data Player = Player {
           West, then South, snake would bump into itself
      -}
    ,_nextSnakeDirection :: Direction
+   ,_colour             :: Colour
 } deriving (Eq, Show)
 
 makeLenses ''Player
 
-initialPlayer = Player 
+initialPlayer = Player
               Human
               initialSnake
               (initialSnake^.direction)
+              Green
 
 initialPlayerBottom = Player
               Human
               initialSnakeBottom
               (initialSnakeBottom^.direction)
+              Green
 
 initialComputer = Player
               AI
               initialSnakeBottom
               (initialSnakeBottom^.direction)
+              Blue
 
 isHuman :: Player -> Bool
-isHuman (Player Human _ _) = True
-isHuman _ = False 
+isHuman (Player Human _ _ _) = True
+isHuman _ = False
 
 checkPlayerCollision :: Player -> Bool
 checkPlayerCollision player = checkCollision $ player^.snake

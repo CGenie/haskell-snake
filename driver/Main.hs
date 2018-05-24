@@ -2,6 +2,7 @@ module Main where
 
 import Control.Lens
 
+import HSnake.AI
 import HSnake.Basic
 import HSnake.Game
 import HSnake.Graphics
@@ -60,14 +61,49 @@ runLoop :: AppConfig -> GameState -> IO ()
 runLoop = evalStateT . runReaderT loop
 
 
+handleInputHuman :: GameState -> (Maybe SDL.Event) -> ReaderT AppConfig AppState ()
+handleInputHuman gs (Just (SDL.Event _ (SDL.KeyboardEvent k))) =
+  handleInputKeyboard gs k
+handleInputHuman _ _ = return ()
+
+handleInputKeyboard gs (SDL.KeyboardEventData _ SDL.Pressed False keysym) =
+  case SDL.keysymKeycode keysym of
+      SDL.KeycodeDown  -> do
+        put $ players .~ moveHuman South $ gs
+      SDL.KeycodeUp    -> do
+        put $ players .~ moveHuman North $ gs
+      SDL.KeycodeLeft  -> do
+        put $ players .~ moveHuman West $ gs
+      SDL.KeycodeRight -> do
+        put $ players .~ moveHuman East $ gs
+      _          -> return ()
+    where
+      moveHuman dir = mapToIndices (\pl -> setNextPlayerDirection pl dir) (gs^.players) humanPlayerIndices
+          where
+              humanPlayerIndices = findIndices isHuman (gs^.players)
+handleInputKeyboard _ _ = return ()
+
+
+
+-- | poll for event until it is SDL_QUIT or NoEvent
+whileEvents :: MonadIO m => (Maybe SDL.Event -> m ()) -> m Bool
+whileEvents act = do
+    event <- liftIO SDL.pollEvent
+    case event of
+        Just (SDL.Event _ SDL.QuitEvent) -> return True
+        _                                -> do
+            act event
+            return False
+
+
 loop :: AppEnv ()
 loop = do
   gameState <- get
-  --quit <- whileEvents $ handleInputHuman gameState
+  quit <- whileEvents $ handleInputHuman gameState
+  computeAINextMoves
 
-  --paintBoard gameScreen
+  gameState <- get
 
-  --unless quit loop
   drawGame
 
   let ap = gameState^.applePosition
@@ -105,7 +141,27 @@ loop = do
                   else return ()
       else return ()
 
+  if (shouldIncreaseLevel ps)
+      then do
+          newApplePosition <- liftIO $ getRandomApple (totalPlayersPosition ps)
+          -- start new level after apple is eaten
+          put $ applePosition .~ newApplePosition $
+                level .~ (gameState^.level) + 1 $ initialGameState
+      else return ()
+
+  unless quit loop
+
   loop
+
+
+computeAINextMoves :: ReaderT AppConfig AppState ()
+computeAINextMoves = do
+        gameState <- get
+        put $ players .~ movedAI gameState $ gameState
+    where
+        movedAI gs = mapToIndices (\pl -> setNextPlayerDirection pl (computeAIPlayerMove pl gs)) (gs^.players) (aiIndices gs)
+            where
+                aiIndices gs = findIndices (not . isHuman) (gs^.players)
 
 
 updatePlayerDirections :: ReaderT AppConfig AppState ()
@@ -134,6 +190,10 @@ drawGame = do
   gameState   <- get
 
   liftIO $ do
+    -- clear window surface first
+    screen <- SDL.getWindowSurface window
+    clearSurface screen
+
     paintBoard renderer
     paintApple renderer (gameState^.applePosition)
     mapM_ (paintPlayer renderer) (gameState^.players)
@@ -143,7 +203,6 @@ drawGame = do
     showGameMessages window gameState
 
     --SDL.flip window
-    screen <- SDL.getWindowSurface window
     SDL.surfaceBlit gameScreen Nothing screen Nothing
 
     SDL.updateWindowSurface window

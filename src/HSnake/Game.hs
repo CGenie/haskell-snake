@@ -3,6 +3,7 @@ module HSnake.Game where
 import HSnake.Basic
 import HSnake.Board
 import HSnake.Player
+import HSnake.Snake
 
 import Control.Lens
 import Data.Word
@@ -26,3 +27,7 @@ initialGameState = GameState
 
 speedFromLevel :: Integer -> Integer
 speedFromLevel l = toInteger $ floor $ (380 * (0.5**(0.1 * (fromIntegral l))) + 20)
+
+-- if snake's length is greater than 10, then increase level
+shouldIncreaseLevel :: [Player] -> Bool
+shouldIncreaseLevel ps = length (filter (>=10) (map (\pl -> pl^.snake^.len) ps)) > 0
