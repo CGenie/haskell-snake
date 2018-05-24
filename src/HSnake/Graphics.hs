@@ -105,7 +105,7 @@ paintSnakePiece r rect c = do
 
 showGameMessages :: SDL.Window -> GameState -> IO ()
 showGameMessages w gameState = do
-  font <- SDLF.load (root ++ "/liberation.ttf") 25
+  font <- SDLF.load "liberation.ttf" 25
 
   surface <- SDLF.solid font color levelMessage
 
@@ -120,7 +120,6 @@ showGameMessages w gameState = do
   where
     levelMessage = pack $ "Level " ++ (show $ gameState^.level)
     color = sdlColor White
-    root = "/home/przemek/git-work/github/Haskell/haskell-snake"
     startPoint = P $ V2 (fromIntegral gameScreenWidth) 0
 
 renderSurfaceToWindow :: (MonadIO m) => SDL.Window -> SDL.Surface -> SDL.Surface -> (SDL.Point V2 CInt) -> m ()
