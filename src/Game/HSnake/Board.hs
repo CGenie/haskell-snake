@@ -1,9 +1,9 @@
 -- Board.hs -- board logic
-module HSnake.Board where
+module Game.HSnake.Board where
 
 import Control.Lens
 
-import HSnake.Basic
+import Game.HSnake.Basic
 
 data Board = Board {
      _xSize   :: Int,

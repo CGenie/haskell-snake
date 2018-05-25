@@ -2,12 +2,12 @@ module Main where
 
 import Control.Lens
 
-import HSnake.AI
-import HSnake.Basic
-import HSnake.Game
-import HSnake.Graphics
-import HSnake.Player
-import HSnake.Snake
+import Game.HSnake.AI
+import Game.HSnake.Basic
+import Game.HSnake.Game
+import Game.HSnake.Graphics
+import Game.HSnake.Player
+import Game.HSnake.Snake
 
 import Control.Monad
 import Control.Monad.State
@@ -66,6 +66,7 @@ handleInputHuman gs (Just (SDL.Event _ (SDL.KeyboardEvent k))) =
   handleInputKeyboard gs k
 handleInputHuman _ _ = return ()
 
+handleInputKeyboard :: MonadState GameState m => GameState -> SDL.KeyboardEventData -> m ()
 handleInputKeyboard gs (SDL.KeyboardEventData _ SDL.Pressed False keysym) =
   case SDL.keysymKeycode keysym of
       SDL.KeycodeDown  -> do
@@ -104,11 +105,10 @@ loop = do
 
   gameState <- get
 
-  let ap = gameState^.applePosition
+  let apple = gameState^.applePosition
   let ps = gameState^.players
 
   if checkPlayersCollision ps
-      -- TODO: increase level
       then error "Game over"
       else return ()
 
@@ -129,7 +129,7 @@ loop = do
 
               drawGame
 
-              let appleEatersInd = findIndices (playerEatsApple ap) ps
+              let appleEatersInd = findIndices (playerEatsApple apple) ps
               if (length appleEatersInd > 0)
                   then do
                       newApplePosition <- liftIO $ getRandomApple (totalPlayersPosition ps)
@@ -159,9 +159,8 @@ computeAINextMoves = do
         gameState <- get
         put $ players .~ movedAI gameState $ gameState
     where
+        aiIndices gs = findIndices (not . isHuman) (gs^.players)
         movedAI gs = mapToIndices (\pl -> setNextPlayerDirection pl (computeAIPlayerMove pl gs)) (gs^.players) (aiIndices gs)
-            where
-                aiIndices gs = findIndices (not . isHuman) (gs^.players)
 
 
 updatePlayerDirections :: ReaderT AppConfig AppState ()
@@ -202,8 +201,7 @@ drawGame = do
 
     showGameMessages window gameState
 
-    --SDL.flip window
-    SDL.surfaceBlit gameScreen Nothing screen Nothing
+    _ <- SDL.surfaceBlit gameScreen Nothing screen Nothing
 
     SDL.updateWindowSurface window
 

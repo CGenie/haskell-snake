@@ -58,13 +58,13 @@ dependencies:
 library:
   source-dirs: src
   exposed-modules:
-    - HSnake.AI
-    - HSnake.Basic
-    - HSnake.Board
-    - HSnake.Game
-    - HSnake.Graphics
-    - HSnake.Player
-    - HSnake.Snake
+    - Game.HSnake.AI
+    - Game.HSnake.Basic
+    - Game.HSnake.Board
+    - Game.HSnake.Game
+    - Game.HSnake.Graphics
+    - Game.HSnake.Player
+    - Game.HSnake.Snake
 
 executable:
   main: Main.hs

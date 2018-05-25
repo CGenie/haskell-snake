@@ -1,10 +1,10 @@
-module HSnake.Graphics where
+module Game.HSnake.Graphics where
 
-import HSnake.Basic
-import HSnake.Board
-import HSnake.Game
-import HSnake.Player
-import HSnake.Snake
+import Game.HSnake.Basic
+import Game.HSnake.Board
+import Game.HSnake.Game
+import Game.HSnake.Player
+import Game.HSnake.Snake
 
 
 import Control.Lens
@@ -57,8 +57,8 @@ rectHeight :: Int
 rectHeight = gameScreenHeight `div` numRectsY
 
 
-rectFromPoint :: HSnake.Basic.Point -> SDLRect
-rectFromPoint (HSnake.Basic.Point x y) = SDL.Rectangle startPoint size
+rectFromPoint :: Game.HSnake.Basic.Point -> SDLRect
+rectFromPoint (Game.HSnake.Basic.Point x y) = SDL.Rectangle startPoint size
                 where
                     startX = (x - 1)*rectWidth + 1
                     startY = (y - 1)*rectHeight + 1
@@ -68,7 +68,7 @@ rectFromPoint (HSnake.Basic.Point x y) = SDL.Rectangle startPoint size
                     size = V2 (fromIntegral width) (fromIntegral height)
 
 
-rects = [rectFromPoint (HSnake.Basic.Point ptx pty) | ptx <- [1..numRectsX], pty <- [1..numRectsY]]
+rects = [rectFromPoint (Game.HSnake.Basic.Point ptx pty) | ptx <- [1..numRectsX], pty <- [1..numRectsY]]
 rectsVec = DVS.generate (numRectsX * numRectsY)
   (\i -> rects !! i )
 
@@ -82,7 +82,7 @@ paintBoard :: SDL.Renderer -> IO ()
 paintBoard r = do
   paintRects r White
 
-paintApple :: SDL.Renderer -> HSnake.Basic.Point -> IO ()
+paintApple :: SDL.Renderer -> Game.HSnake.Basic.Point -> IO ()
 paintApple r ap = do
   setColor r Red
   SDL.fillRect r $ Just rect

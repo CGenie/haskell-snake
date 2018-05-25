@@ -1,16 +1,16 @@
-module HSnake.Game where
+module Game.HSnake.Game where
 
-import HSnake.Basic
-import HSnake.Board
-import HSnake.Player
-import HSnake.Snake
+import Game.HSnake.Basic
+import Game.HSnake.Board
+import Game.HSnake.Player
+import Game.HSnake.Snake
 
 import Control.Lens
 import Data.Word
 
 data GameState = GameState {
      _players            :: [Player],
-     _applePosition      :: HSnake.Basic.Point,
+     _applePosition      :: Game.HSnake.Basic.Point,
      _board              :: Board,
      _level              :: Int,
      _lastTick           :: Word32
@@ -20,7 +20,7 @@ makeLenses ''GameState
 initialGameState :: GameState
 initialGameState = GameState
                  [initialPlayer, initialComputer]
-                 (HSnake.Basic.Point 0 0)
+                 (Game.HSnake.Basic.Point 0 0)
                  initialBoard
                  1
                  0

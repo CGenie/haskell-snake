@@ -1,5 +1,5 @@
 -- Basic.hs -- basic functions and datatypes
-module HSnake.Basic where
+module Game.HSnake.Basic where
 
 import Control.Lens
 

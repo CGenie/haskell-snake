@@ -1,9 +1,9 @@
 -- Snake.hs: Snake-control logic
-module HSnake.Snake where
+module Game.HSnake.Snake where
 
 import Control.Lens
 
-import HSnake.Basic
+import Game.HSnake.Basic
 
 import Data.List (nub, sort)
 
@@ -46,9 +46,16 @@ checkCollision snake = outOfBoundary || selfCollision
                     selfCollision = (length (nub snakePosition)) /= (length snakePosition)
 
 -- | Starting position & body
+initialSnakePosition :: [Point]
 initialSnakePosition = [Point 6 6]
+
+initialSnakePositionBottom :: [Point]
 initialSnakePositionBottom = [Point 6 11]
+
+initialSnake :: Snake
 initialSnake = Snake initialSnakePosition North 1
+
+initialSnakeBottom :: Snake
 initialSnakeBottom = Snake initialSnakePositionBottom North 1
 
 snakeEatsApple :: Snake -> Point -> Bool
@@ -56,9 +63,9 @@ snakeEatsApple snake apple = apple `elem` (snake^.position)
 
 -- | Don't allow to change to opposite direction immediately
 tryChangeSnakeDirection :: Direction -> Direction -> Direction
-tryChangeSnakeDirection direction snakeDirection
-            | oppositeDirections direction snakeDirection = snakeDirection
-            | otherwise    = direction
+tryChangeSnakeDirection d sd
+  | oppositeDirections d sd = sd
+  | otherwise    = d
 
 changeSnakeDirection :: Snake -> Direction -> Snake
-changeSnakeDirection snake dir = direction .~ (tryChangeSnakeDirection dir (snake^.direction)) $ snake
+changeSnakeDirection s d = direction .~ (tryChangeSnakeDirection d (s^.direction)) $ s

@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 192b2c53b1c47172c4eb5a55573b1c4f70e7f7b0154cf198cf6d353efb1a6134
+-- hash: 60583e315dd2851d455eb1c3beba4cfd260b5fecb8b670efc23c1f0c6070679a
 
 name:           haskell-snake
 version:        1.0.0
@@ -26,13 +26,13 @@ source-repository head
 
 library
   exposed-modules:
-      HSnake.AI
-      HSnake.Basic
-      HSnake.Board
-      HSnake.Game
-      HSnake.Graphics
-      HSnake.Player
-      HSnake.Snake
+      Game.HSnake.AI
+      Game.HSnake.Basic
+      Game.HSnake.Board
+      Game.HSnake.Game
+      Game.HSnake.Graphics
+      Game.HSnake.Player
+      Game.HSnake.Snake
   other-modules:
       Paths_haskell_snake
   hs-source-dirs:

@@ -1,9 +1,9 @@
-module HSnake.Player where
+module Game.HSnake.Player where
 
 import Control.Lens
 
-import HSnake.Basic
-import HSnake.Snake
+import Game.HSnake.Basic
+import Game.HSnake.Snake
 
 import Data.List
 
@@ -24,18 +24,21 @@ data Player = Player {
 
 makeLenses ''Player
 
+initialPlayer :: Player
 initialPlayer = Player
               Human
               initialSnake
               (initialSnake^.direction)
               Green
 
+initialPlayerBottom :: Player
 initialPlayerBottom = Player
               Human
               initialSnakeBottom
               (initialSnakeBottom^.direction)
               Green
 
+initialComputer :: Player
 initialComputer = Player
               AI
               initialSnakeBottom

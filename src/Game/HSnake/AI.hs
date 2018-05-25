@@ -1,11 +1,11 @@
-module HSnake.AI where
+module Game.HSnake.AI where
 
 import Control.Lens
 
-import HSnake.Basic
-import HSnake.Game
-import HSnake.Player
-import HSnake.Snake
+import Game.HSnake.Basic
+import Game.HSnake.Game
+import Game.HSnake.Player
+import Game.HSnake.Snake
 
 computeAIPlayerMove :: Player -> GameState -> Direction
 computeAIPlayerMove pl gameState = circleAIPlayer pl
