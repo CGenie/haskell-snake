@@ -1,8 +1,10 @@
--- This file has been generated from package.yaml by hpack version 0.27.0.
+cabal-version: 1.12
+
+-- This file has been generated from package.yaml by hpack version 0.31.0.
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 60583e315dd2851d455eb1c3beba4cfd260b5fecb8b670efc23c1f0c6070679a
+-- hash: 639813671558ceec4b147487be087e48440e4142ae22dfb84569f4ca1698a96c
 
 name:           haskell-snake
 version:        1.0.0
@@ -15,8 +17,6 @@ maintainer:     Przemysław Kamiński <cgenie@gmail.com>
 license:        GPL-3
 license-file:   LICENSE
 build-type:     Simple
-cabal-version:  >= 1.10
-
 extra-source-files:
     CHANGELOG.md
 

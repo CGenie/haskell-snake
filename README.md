@@ -7,4 +7,9 @@ Snake game implemetation in Haskell using SDL2.
 
 Make sure the `liberation.ttf` font file is in your current working directory.
 
-To build, just use `stack`.
+To build, just use `stack`:
+
+```bash
+stack build
+stack exec haskell-snake
+```
